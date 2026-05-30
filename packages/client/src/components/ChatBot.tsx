@@ -1,8 +1,9 @@
+import axios from 'axios';
+import { useRef, useState, type KeyboardEvent } from 'react';
+import ReactMarkdown from 'react-markdown';
+import { useForm } from 'react-hook-form';
 import { FaArrowUp } from 'react-icons/fa';
 import { Button } from './ui/button';
-import { useForm } from 'react-hook-form';
-import { useRef, useState, type KeyboardEvent } from 'react';
-import axios from 'axios';
 
 type FormData = {
    prompt: string;
@@ -49,7 +50,7 @@ const ChatBot = () => {
                   key={index}
                   className={`px-3 py-1 rounded-xl ${message.role === 'user' ? 'bg-blue-600 text-white self-end' : 'bg-gray-100 text-black self-start'}`}
                >
-                  {message.content}
+                  <ReactMarkdown>{message.content}</ReactMarkdown>
                </p>
             ))}
          </div>
