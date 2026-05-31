@@ -1,5 +1,11 @@
 import axios from 'axios';
-import { useRef, useState, type KeyboardEvent } from 'react';
+import {
+   useEffect,
+   useRef,
+   useState,
+   type ClipboardEvent,
+   type KeyboardEvent,
+} from 'react';
 import ReactMarkdown from 'react-markdown';
 import { useForm } from 'react-hook-form';
 import { FaArrowUp } from 'react-icons/fa';
@@ -21,8 +27,13 @@ type Message = {
 const ChatBot = () => {
    const [messages, setMessages] = useState<Message[]>([]);
    const [isBotTyping, setIsBotTyping] = useState(false);
+   const formRef = useRef<HTMLFormElement | null>(null);
    const conversationId = useRef(crypto.randomUUID());
    const { register, handleSubmit, reset, formState } = useForm<FormData>();
+
+   useEffect(() => {
+      formRef.current?.scrollIntoView({ behavior: 'smooth' });
+   }, [messages]);
 
    const onSubmit = async ({ prompt }: FormData) => {
       setMessages((prev) => [...prev, { content: prompt, role: 'user' }]);
@@ -45,12 +56,20 @@ const ChatBot = () => {
       }
    };
 
+   const onCopyMessage = (e: ClipboardEvent): void => {
+      const selection = window.getSelection()?.toString().trim();
+      if (selection) {
+         e.preventDefault();
+         e.clipboardData.setData('text/plan', selection);
+      }
+   };
    return (
-      <div>
-         <div className="flex flex-col gap-3 mb-10">
+      <div className="flex flex-col bg-amber-300">
+         <div className="flex flex-col flex-1 gap-3 mb-10">
             {messages?.map((message, index) => (
                <p
                   key={index}
+                  onCopy={onCopyMessage}
                   className={`px-3 py-1 rounded-xl ${message.role === 'user' ? 'bg-blue-600 text-white self-end' : 'bg-gray-100 text-black self-start'}`}
                >
                   <ReactMarkdown>{message.content}</ReactMarkdown>
@@ -67,6 +86,7 @@ const ChatBot = () => {
          <form
             onSubmit={handleSubmit(onSubmit)}
             onKeyDown={onKeyDown}
+            ref={formRef}
             className="flex flex-col gap-2 items-end p-4 border-2 rounded-3xl"
          >
             <textarea
