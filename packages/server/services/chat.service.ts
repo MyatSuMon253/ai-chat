@@ -1,5 +1,8 @@
 import OpenAI from 'openai';
 import { conversationRepository } from '../repositories/conversation.repository';
+import template from '../llm/prompts/chatbot.txt';
+import fs from 'fs';
+import path from 'path';
 
 // Implementation detail
 const client = new OpenAI({
@@ -10,6 +13,12 @@ type ChatResponse = {
    id: string;
    message: string;
 };
+
+const parkInfo = fs.readFileSync(
+   path.join(__dirname, '..', 'prompts', 'WonderWorld.md'),
+   'utf8'
+);
+const instructions = template.replace('{{parkInfo}}', parkInfo);
 
 // Public interface
 // Leaky abstraction
