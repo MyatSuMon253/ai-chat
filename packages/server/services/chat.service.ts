@@ -15,7 +15,7 @@ type ChatResponse = {
 };
 
 const parkInfo = fs.readFileSync(
-   path.join(__dirname, '..', 'prompts', 'WonderWorld.md'),
+   path.join(__dirname, '..', 'llm/prompts', 'WonderWorld.md'),
    'utf8'
 );
 const instructions = template.replace('{{parkInfo}}', parkInfo);
