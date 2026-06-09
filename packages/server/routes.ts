@@ -3,11 +3,16 @@ import type { Request, Response } from 'express';
 import { chatController } from './controllers/chat.controller';
 import { PrismaMariaDb } from '@prisma/adapter-mariadb';
 import { PrismaClient } from './generated/prisma/client';
+import { reviewController } from './controllers/review.controller';
 
-const adapter = new PrismaMariaDb({
-   host: process.env.DATABASE_HOST,
-   database: process.env.DATABASE_NAME,
-});
+// Use DATABASE_URL (the only connection env var defined in .env)
+const databaseUrl = process.env.DATABASE_URL;
+if (!databaseUrl) {
+   throw new Error('DATABASE_URL environment variable is required');
+}
+
+const adapter = new PrismaMariaDb(databaseUrl);
+export const prisma = new PrismaClient({ adapter });
 
 const router = express.Router();
 
@@ -21,21 +26,6 @@ router.get('/api/hello', (req: Request, res: Response) => {
 
 router.post('/api/chat', chatController.sendMessage);
 
-router.get('/api/products/:id/reviews', async (req: Request, res: Response) => {
-   const prisma = new PrismaClient({ adapter });
-   const productId = Number(req.params.id);
-
-   if (isNaN(productId)) {
-      res.status(400).json({ error: 'Invalid product ID.' });
-      return;
-   }
-
-   const reviews = await prisma.review.findMany({
-      where: { productId },
-      orderBy: { createdAt: 'desc' },
-   });
-
-   res.json(reviews);
-});
+router.get('/api/products/:id/reviews', reviewController.getReviews);
 
 export default router;
