@@ -12,8 +12,8 @@ export const reviewService = {
       const existingSummary =
          await reviewRepository.getReviewSummary(productId);
 
-      if (existingSummary && existingSummary.expiresAt > new Date()) {
-         return existingSummary.content;
+      if (existingSummary) {
+         return existingSummary;
       }
 
       // get the last 10 reviews

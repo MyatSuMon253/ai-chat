@@ -14,13 +14,18 @@ export const reviewController = {
 
       const product = await productRepository.getProduct(productId);
       if (!product) {
-         res.status(400).json({ error: 'Invalid product  ' });
+         res.status(400).json({ error: 'Invalid product' });
+         return;
       }
 
       try {
-         const reviews = reviewService.getReviews(productId);
+         const reviews = reviewRepository.getReviews(productId);
+         const summary = await reviewRepository.getReviewSummary(productId);
 
-         res.json(reviews);
+         res.json({
+            summary,
+            reviews,
+         });
       } catch (error) {
          console.error('Failed to fetch reviews:', error);
          res.status(500).json({ error: 'Failed to fetch reviews.' });
