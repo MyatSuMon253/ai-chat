@@ -26,7 +26,8 @@ const openAIClient = new OpenAI({
    baseURL: 'https://api.openai.com/v1',
 });
 
-const inferenceClient = new InferenceClient(process.env.HF_TOKEN!);
+const hfToken = process.env.HF_TOKEN;
+const inferenceClient = hfToken ? new InferenceClient(hfToken) : null;
 
 export const llmClient = {
    async generateText({
@@ -50,13 +51,40 @@ export const llmClient = {
       };
    },
 
-   async summarize(text: string) {
-      const output = await inferenceClient.summarization({
-         model: 'facebook/bart-large-cnn',
-         inputs: text,
-         provider: 'hf-inference',
+   async summarize(text: string): Promise<string> {
+      if (inferenceClient) {
+         try {
+            const output = await inferenceClient.summarization(
+               {
+                  model: 'facebook/bart-large-cnn',
+                  inputs: text,
+                  provider: 'hf-inference',
+               },
+               {
+                  retry_on_error: false,
+                  signal: AbortSignal.timeout(10_000),
+               }
+            );
+
+            if (output.summary_text.trim()) {
+               return output.summary_text;
+            }
+         } catch (error) {
+            const message =
+               error instanceof Error ? error.message : String(error);
+            console.warn(`Hugging Face summarization failed: ${message}`);
+         }
+      }
+
+      const response = await openAIClient.responses.create({
+         model: 'gpt-4.1',
+         instructions:
+            'Summarize the customer reviews into one short paragraph. Include both positive and negative themes.',
+         input: text,
+         temperature: 0.2,
+         max_output_tokens: 500,
       });
 
-      return output.summary_text;
+      return response.output_text;
    },
 };
