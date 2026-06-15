@@ -1,15 +1,5 @@
 import OpenAI from 'openai';
-
-const apiKey = process.env.OPENAI_API_KEY;
-
-if (!apiKey) {
-   throw new Error('OPENAI_API_KEY environment variable is required');
-}
-
-const client = new OpenAI({
-   apiKey,
-   baseURL: 'https://api.openai.com/v1',
-});
+import { InferenceClient } from '@huggingface/inference';
 
 type GenerateTextOptions = {
    model?: string;
@@ -25,6 +15,19 @@ type GenerateTextResult = {
    text: string;
 };
 
+const apiKey = process.env.OPENAI_API_KEY;
+
+if (!apiKey) {
+   throw new Error('OPENAI_API_KEY environment variable is required');
+}
+
+const openAIClient = new OpenAI({
+   apiKey,
+   baseURL: 'https://api.openai.com/v1',
+});
+
+const inferenceClient = new InferenceClient(process.env.HF_TOKEN!);
+
 export const llmClient = {
    async generateText({
       model = 'gpt-4.1',
@@ -33,7 +36,7 @@ export const llmClient = {
       temperature = 0.2,
       maxTokens = 300,
    }: GenerateTextOptions): Promise<GenerateTextResult> {
-      const response = await client.responses.create({
+      const response = await openAIClient.responses.create({
          model,
          input: prompt,
          instructions,
@@ -45,5 +48,15 @@ export const llmClient = {
          id: response.id,
          text: response.output_text,
       };
+   },
+
+   async summarize(text: string) {
+      const output = await inferenceClient.summarization({
+         model: 'facebook/bart-large-cnn',
+         inputs: text,
+         provider: 'hf-inference',
+      });
+
+      return output.summary_text;
    },
 };

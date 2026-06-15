@@ -54,7 +54,7 @@ const ReviewList = ({ productId }: Props) => {
             ) : (
                <div>
                   <Button
-                     onClick={() => summaryMutation.mutate}
+                     onClick={() => summaryMutation.mutate()}
                      className="cursor-pointer"
                      disabled={summaryMutation.isPending}
                   >
