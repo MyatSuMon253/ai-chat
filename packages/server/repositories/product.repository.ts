@@ -1,4 +1,4 @@
-import { prisma } from '../routes';
+import { prisma } from '../database/prisma';
 
 export const productRepository = {
    getProduct(productId: number) {

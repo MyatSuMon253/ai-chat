@@ -1,5 +1,5 @@
 import type { Review } from '../generated/prisma/client';
-import { prisma } from '../routes';
+import { prisma } from '../database/prisma';
 import dayjs from 'dayjs';
 
 export const reviewRepository = {
@@ -7,6 +7,7 @@ export const reviewRepository = {
       return await prisma.review.findMany({
          where: { productId },
          orderBy: { createdAt: 'desc' },
+         take: limit,
       });
    },
 

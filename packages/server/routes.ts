@@ -1,18 +1,7 @@
 import express from 'express';
 import type { Request, Response } from 'express';
 import { chatController } from './controllers/chat.controller';
-import { PrismaMariaDb } from '@prisma/adapter-mariadb';
-import { PrismaClient } from './generated/prisma/client';
 import { reviewController } from './controllers/review.controller';
-
-// Use DATABASE_URL (the only connection env var defined in .env)
-const databaseUrl = process.env.DATABASE_URL;
-if (!databaseUrl) {
-   throw new Error('DATABASE_URL environment variable is required');
-}
-
-const adapter = new PrismaMariaDb(databaseUrl);
-export const prisma = new PrismaClient({ adapter });
 
 const router = express.Router();
 

@@ -19,7 +19,7 @@ export const reviewController = {
       }
 
       try {
-         const reviews = reviewRepository.getReviews(productId);
+         const reviews = await reviewRepository.getReviews(productId);
          const summary = await reviewRepository.getReviewSummary(productId);
 
          res.json({
@@ -43,9 +43,10 @@ export const reviewController = {
       const reviews = await reviewRepository.getReviews(productId, 1);
       if (!reviews.length) {
          res.status(400).json({ error: 'There are no reviews to summarize' });
+         return;
       }
 
-      const summary = reviewService.summarizeReviews(productId);
+      const summary = await reviewService.summarizeReviews(productId);
       res.json({ summary });
    },
 };
