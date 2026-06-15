@@ -1,4 +1,4 @@
-import 'dotenv/config';
+import './config/env';
 import express from 'express';
 import router from './routes';
 import { connectDatabase, disconnectDatabase } from './database/prisma';

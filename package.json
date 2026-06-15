@@ -4,7 +4,7 @@
    "type": "module",
    "private": true,
    "scripts": {
-      "dev": "bun run index.ts",
+      "dev": "concurrently \"cd packages/server && bun run dev\" \"cd packages/client && npm run dev\"",
       "format": "prettier --write .",
       "prepare": "husky"
    },

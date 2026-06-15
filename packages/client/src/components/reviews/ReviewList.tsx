@@ -1,6 +1,8 @@
 import axios from 'axios';
 import { useEffect, useState } from 'react';
 import StarRating from './StarRating';
+import Skeleton from 'react-loading-skeleton';
+import { useQuery } from '@tanstack/react-query';
 
 type Props = {
    productId: number;
@@ -20,18 +22,39 @@ type GetReviewsResponse = {
 };
 
 const ReviewList = ({ productId }: Props) => {
-   const [reviewData, setReviewData] = useState<GetReviewsResponse>();
+   const {
+      data: reviewData,
+      error,
+      isLoading,
+   } = useQuery<GetReviewsResponse>({
+      queryKey: ['reviews', productId],
+      queryFn: () => fetchReviews(),
+   });
 
    const fetchReviews = async () => {
       const { data } = await axios.get<GetReviewsResponse>(
          `/api/products/${productId}/reviews`
       );
-      setReviewData(data);
+      return data;
    };
 
-   useEffect(() => {
-      fetchReviews();
-   }, []);
+   if (isLoading) {
+      return (
+         <div className="flex flex-col gap-5">
+            {[1, 2, 3].map((i) => (
+               <div key={i}>
+                  <Skeleton width={150} />
+                  <Skeleton width={100} />
+                  <Skeleton count={2} />
+               </div>
+            ))}
+         </div>
+      );
+   }
+
+   if (error) {
+      return <p className="text-red-600">{error?.message}</p>;
+   }
 
    return (
       <div className="flex flex-col gap-5">

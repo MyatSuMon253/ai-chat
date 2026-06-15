@@ -12,15 +12,17 @@ export const reviewController = {
          return;
       }
 
-      const product = await productRepository.getProduct(productId);
-      if (!product) {
-         res.status(400).json({ error: 'Invalid product' });
-         return;
-      }
-
       try {
-         const reviews = await reviewRepository.getReviews(productId);
-         const summary = await reviewRepository.getReviewSummary(productId);
+         const product = await productRepository.getProduct(productId);
+         if (!product) {
+            res.status(404).json({ error: 'Product not found.' });
+            return;
+         }
+
+         const [reviews, summary] = await Promise.all([
+            reviewRepository.getReviews(productId),
+            reviewRepository.getReviewSummary(productId),
+         ]);
 
          res.json({
             summary,
