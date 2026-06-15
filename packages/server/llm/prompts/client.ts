@@ -1,7 +1,14 @@
 import OpenAI from 'openai';
 
+const apiKey = process.env.OPENAI_API_KEY;
+
+if (!apiKey) {
+   throw new Error('OPENAI_API_KEY environment variable is required');
+}
+
 const client = new OpenAI({
-   apiKey: process.env.OPENAI_API_KEY,
+   apiKey,
+   baseURL: 'https://api.openai.com/v1',
 });
 
 type GenerateTextOptions = {
@@ -29,6 +36,7 @@ export const llmClient = {
       const response = await client.responses.create({
          model,
          input: prompt,
+         instructions,
          temperature,
          max_output_tokens: maxTokens,
       });

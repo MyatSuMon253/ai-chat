@@ -42,13 +42,22 @@ export const reviewController = {
          return;
       }
 
-      const reviews = await reviewRepository.getReviews(productId, 1);
-      if (!reviews.length) {
-         res.status(400).json({ error: 'There are no reviews to summarize' });
-         return;
-      }
+      try {
+         const reviews = await reviewRepository.getReviews(productId, 1);
+         if (!reviews.length) {
+            res.status(400).json({
+               error: 'There are no reviews to summarize',
+            });
+            return;
+         }
 
-      const summary = await reviewService.summarizeReviews(productId);
-      res.json({ summary });
+         const summary = await reviewService.summarizeReviews(productId);
+         res.json({ summary });
+      } catch (error) {
+         console.error('Failed to summarize reviews:', error);
+         res.status(502).json({
+            error: 'The review summary service is currently unavailable.',
+         });
+      }
    },
 };

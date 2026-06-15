@@ -20,7 +20,7 @@ export const reviewService = {
       const reviews = await reviewRepository.getReviews(productId, 10);
       const joinedReviews = reviews.map((r) => r.content).join('\n\n');
 
-      const prompt = template.replace('${{reviews}}', joinedReviews);
+      const prompt = template.replace('{{reviews}}', joinedReviews);
 
       // send the reviews to a LLM
       const { text: summary } = await llmClient.generateText({
