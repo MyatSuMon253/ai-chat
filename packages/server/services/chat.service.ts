@@ -2,7 +2,7 @@ import { conversationRepository } from '../repositories/conversation.repository'
 import template from '../llm/prompts/chatbot.txt';
 import fs from 'fs';
 import path from 'path';
-import { llmClient } from '../llm/prompts/client';
+import { llmClient } from '../llm/client';
 
 type ChatResponse = {
    id: string;

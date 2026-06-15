@@ -1,6 +1,6 @@
 import type { Review } from '../generated/prisma/client';
 import { reviewRepository } from '../repositories/review.repository';
-import { llmClient } from '../llm/prompts/client';
+import { llmClient } from '../llm/client';
 
 export const reviewService = {
    async getReviews(productId: number): Promise<Review[]> {
@@ -19,7 +19,7 @@ export const reviewService = {
       const reviews = await reviewRepository.getReviews(productId, 10);
       const joinedReviews = reviews.map((r) => r.content).join('\n\n');
 
-      const summary = await llmClient.summarize(joinedReviews);
+      const summary = await llmClient.summarizeReviews(joinedReviews);
       if (!summary.trim()) {
          throw new Error('The summarization model returned an empty response');
       }
